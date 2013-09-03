@@ -1,0 +1,32 @@
+{% extends "signin/base.html" %}
+
+
+{% block content_inner %}
+
+    <div class="splash">
+        <div class="pure-g-r">
+
+            <div class="pure-u-2-3">
+                <div class="l-box splash-text">
+                     <h3></h3>
+
+                    <h1 class="splash-head">
+                        Excellent!
+                    </h1>
+
+                    <h2 class="splash-subhead">
+                        You're on your way to become an even prouder house owner!
+                    </h2>
+
+                    <p>
+                        <a class="pure-button primary-button"
+                           href="{{ url('main:home', house.slug) }}">Proceed to your own home page for <b>{{ house.name }}</b></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

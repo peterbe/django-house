@@ -1,0 +1,139 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+    <div class="splash">
+        <div class="pure-g-r">
+            <div class="pure-u-1-3">
+                <div class="l-box splash-image">
+                {% if cover_photo %}
+                    {% set big = thumbnail(cover_photo.photo, "400x400") %}
+                    <img src="{{ big.url }}" width="{{ big.width }}" height="{{ big.height }}"
+                         alt="{% if cover_photo.title %}{{ cover_photo.title }}{% else %}{{ house.name }}{% endif %}">
+                {% else %}
+                    <div style="border:2px solid #999; width:400px; height: 260px; vertical-align: middle">
+                        <p style="margin:auto; text-align:center"><a href="{{ url('main:photos.upload', house.slug) }}">Upload a cover photo</a></p>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+
+            <div class="pure-u-2-3">
+                <div class="l-box splash-text">
+                    <h1 class="splash-head">
+                        {{ page_title }}
+                    </h1>
+
+                    <h2 class="splash-subhead">
+                        <b>{{ page_title }}</b> is where you store all interesting and helpful information about the house you own and love so much.
+                    </h2>
+
+                    <p>
+                        {% if cover_photo %}
+                        {% else %}
+                        <a href="{{ url('main:photos.upload', house.slug) }}" class="pure-button primary-button">Upload your cover photo</a>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+    <div class="content">
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-2-3">
+                <div class="l-box">
+                    <h4 class="content-subhead">Your Address</h4>
+
+                    <h3>Lorem ipsum dolor sit amet.</h3>
+                    <p>
+                        Pellentesque hendrerit lobortis ornare. Fusce luctus imperdiet consequat. Nullam quis nunc quis ligula luctus vestibulum non quis libero. Suspendisse tristique nisl ut velit facilisis sit amet lobortis nulla pharetra.
+                    </p>
+                </div>
+            </div>
+
+            <div class="pure-u-1-3">
+                <div class="l-box">
+                    <img src="http://placehold.it/400x250"
+                         alt="Placeholder image for example.">
+                </div>
+            </div>
+        </div>
+        -->
+
+        <!--
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-1-3">
+                <div class="l-box">
+                    <img src="http://placehold.it/400x250"
+                         alt="Placeholder image for example.">
+                </div>
+            </div>
+
+            <div class="pure-u-2-3">
+                <div class="l-box">
+                    <h4 class="content-subhead">Some more small text</h4>
+
+                    <h3>Etiam iaculis iaculis lobortis.</h3>
+                    <p>
+                        Phasellus eget enim eu lectus faucibus vestibulum. Suspendisse sodales pellentesque elementum. Morbi fermentum dui sit amet libero tincidunt rutrum. Nam sodales consequat metus sed accumsan.
+                    </p>
+                </div>
+            </div>
+        </div>
+        -->
+
+        <div class="pure-g-r">
+            <div class="pure-u-1-4">
+                <div class="l-box">
+                    <h3>Your Address</h3>
+
+                    <p>
+                      {% set address = house.address %}
+                      {{ address.line1 }}<br>
+                      {% if address.line2 %}{{ address.line2 }}<br>{% endif %}
+                      {{ address.city }}, {{ address.state }}<br>
+                      {% if address.zip_code %}{{ address.zip_code }}<br>{% endif %}
+                      {% if address.country %}{{ address.country }}<br>{% endif %}
+                    </p>
+                    <p>
+                        <a href="{{ url('main:address', house.slug) }}">Change this address</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="pure-u-1-4">
+                <div class="l-box">
+                    <h3>Subheading</h3>
+                    <p>
+                        Donec suscipit, risus vel venenatis ornare, nibh massa ultrices diam, a elementum metus felis sit amet eros. Phasellus pellentesque euismod massa sed pellentesque.
+                    </p>
+                </div>
+            </div>
+
+            <div class="pure-u-1-4">
+                <div class="l-box">
+                    <h3>Subheading</h3>
+                    <p>
+                        Donec suscipit, risus vel venenatis ornare, nibh massa ultrices diam, a elementum metus felis sit amet eros. Phasellus pellentesque euismod massa sed pellentesque.
+                    </p>
+                </div>
+            </div>
+
+            <div class="pure-u-1-4">
+                <div class="l-box">
+                    <h3>Subheading</h3>
+                    <p>
+                        Donec suscipit, risus vel venenatis ornare, nibh massa ultrices diam, a elementum metus felis sit amet eros. Phasellus pellentesque euismod massa sed pellentesque.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="l-box ribbon">
+            <h2>Get started now.</h2>
+            <a href="#" class="pure-button primary-button">Sign up</a>
+        </div>
+    </div>
+
+{% endblock %}

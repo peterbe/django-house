@@ -1,0 +1,43 @@
+{% extends "signin/base.html" %}
+
+{% block extra_head %}
+{% endblock %}
+
+{% block content_inner %}
+
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                    <h4 class="content-subhead">Your Address</h4>
+
+                    <form method="post" class="register pure-form pure-form-stacked">
+                      {{ csrf() }}
+                      <fieldset>
+                        {{ pureform(form) }}
+                        <button type="submit" class="pure-button pure-button-primary">Save</button>
+                      </fieldset>
+                    </form>
+
+
+                </div>
+            </div>
+
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                 <div id="map-canvas"
+                   data-initial-lat="{{ house.address.latitude }}"
+                   data-initial-lng="{{ house.address.longitude }}"
+                   style="width: 640px; height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+{% endblock %}
+
+{% block extra_javascript %}
+{{ super() }}
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script src="{{ static('main/js/address.js') }}"></script>
+{% endblock %}

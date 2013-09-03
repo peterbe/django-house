@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+            {% block navigation %}
+            <ul>
+                <li class="pure-menu-selected"><a href="{{ url('main:home', house.slug) }}">Home</a></li>
+                <li><a href="{{ url('main:photos', house.slug) }}">Photos</a></li>
+                <li><a href="{{ url('main:documents', house.slug) }}">Documents</a></li>
+            </ul>
+            {% endblock %}

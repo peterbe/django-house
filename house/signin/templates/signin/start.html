@@ -1,0 +1,44 @@
+{% extends "signin/base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ static('signin/css/persona-buttons.css') }}">
+{% endblock %}
+
+{% block content_inner %}
+{{ browserid_info() }}
+
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-2-3">
+                <div class="l-box">
+                    <h4 class="content-subhead">Sign in first</h4>
+
+                    <h3>Let Mozilla's Persona handle the password stuff</h3>
+                    <p>
+                        Because <b>{{ page_title }}</b> doesn't want to store your password,
+                        we outsource that entirely to <b>Mozilla Persona</b>. That way you can
+                        securely sign in with your existing email address is a secure way.
+                    </p>
+                </div>
+            </div>
+
+            <div class="pure-u-1-3">
+                <div class="l-box">
+                    {% if user.is_authenticated() %}
+                    <p>You're already signed in.</p>
+                    <p><a href="{{ url('signin:register') }}">Proceed to registration</a></p>
+                    {% else %}
+                    <a href="#" data-next="/signin/" class="browserid-login persona-button dark"><span>Sign in with your Email</span></a>
+                    {# {{ browserid_login(text='Login') }} #}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+
+
+{% endblock %}
+
+{% block extra_javascript %}
+{{ super() }}
+{{ browserid_js() }}
+{% endblock %}
