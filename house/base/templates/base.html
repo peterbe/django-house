@@ -30,11 +30,13 @@
             </p>
 
             {% block navigation %}
+	    <!--
             <ul>
                 <li class="pure-menu-selected"><a href="/">Home</a></li>
                 <li><a href="/pictures">Pictures</a></li>
                 <li><a href="/documents">Documents</a></li>
             </ul>
+	    -->
             {% endblock %}
 
         </div>
@@ -51,6 +53,10 @@
     </div>
 </div>
 
+
+{% block jquery %}
+<script src="{{ static('js/jquery-1.10.2.min.js') }}"></script>
+{% endblock %}
 
 {% block extra_javascript %}
 {% endblock %}
