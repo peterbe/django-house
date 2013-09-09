@@ -96,6 +96,18 @@ class Document(models.Model):
     modified = models.DateTimeField(default=now)
 
 
+class Invitation(models.Model):
+    house = models.ForeignKey(House)
+    user = models.ForeignKey(User)
+    email_address = models.EmailField()
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+    send_date = models.DateTimeField(blank=True, null=True)
+
+    added = models.DateTimeField(default=now)
+    modified = models.DateTimeField(default=now)
+
 @receiver(models.signals.pre_save, sender=House)
 @receiver(models.signals.pre_save, sender=Photo)
 @receiver(models.signals.pre_save, sender=Document)

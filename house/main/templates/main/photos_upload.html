@@ -1,0 +1,36 @@
+{% extends "main/base.html" %}
+
+{% block content_inner %}
+
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                    <h4 class="content-subhead">Photo Upload</h4>
+
+                    <p>All upload is done using FilePicker. It's simpler. It's safer.</p>
+                    <form method="post" class="upload pure-form pure-form-stacked">
+                      {{ csrf() }}
+                      <fieldset>
+                        {{ pureform(form) }}
+                        <button type="submit" class="pure-button pure-button-primary">Save</button>
+                      </fieldset>
+                    </form>
+
+
+                </div>
+            </div>
+
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                  FILEPICKER
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
+
+{% block extra_javascript %}
+<script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
+<script>filepicker.setKey('{{ filepicker_api_key }}');</script>
+<script src="{{ static('main/js/photos_upload.js') }}"></script>
+{% endblock %}

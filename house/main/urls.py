@@ -25,4 +25,7 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[-\w]+)/documents/$',
         views.documents,
         name='documents'),
+    url(r'^(?P<slug>[-\w]+)/accounts/$',
+        views.accounts,
+        name='accounts'),
 )

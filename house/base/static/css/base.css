@@ -86,3 +86,7 @@ body .primary-button {
     padding: 1em;
     font-size: 80%;
 }
+
+.required {
+    color: red;
+}

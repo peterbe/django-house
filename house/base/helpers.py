@@ -11,8 +11,8 @@ def static(path):
 
 
 @register.function
-def pureform(form):
-    context = {'form': form}
+def pureform(form, **kwargs):
+    context = dict(kwargs, form=form)
     return jinja2.Markup(
         render_to_string('_pureform.html', context)
     )

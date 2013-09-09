@@ -201,3 +201,5 @@ JINGO_EXCLUDE_APPS = (
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 ENGAGE_ROBOTS = False
+
+WEBMASTER_FROM = '%s <noreply@ilovemyhouse.com>' % PROJECT_TITLE

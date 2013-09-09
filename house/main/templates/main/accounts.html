@@ -1,0 +1,54 @@
+{% extends "main/base.html" %}
+
+{% block extra_head %}
+<style type="text/css">
+textarea { width: 350px !important; height: 80px; }
+</style>
+{% endblock %}
+
+{% block content_inner %}
+
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                    <h4 class="content-subhead">Accounts</h4>
+
+                    <p><strong>The following people have access to manage this house:</strong></p>
+
+                    <ul>
+                        {% for user in house.owners.all() %}
+                        <li>{% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                        {% else %}
+                        {{ user.email }}
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+
+
+                </div>
+            </div>
+
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                    <form method="post" class="invite pure-form pure-form-stacked">
+                      {{ csrf() }}
+                      <fieldset>
+                        {{ pureform(form, indicate_required=True) }}
+                        <button type="submit" class="pure-button pure-button-primary">Send Invite</button>
+                      </fieldset>
+                    </form>
+
+                    <p style="font-size:80%"><span class="required">*</span> required fields</p>
+
+                    <p>Because <strong>{{ PROJECT_TITLE }}</strong> doesn't store password they have to
+                    sign in with <strong>Persona</strong> like you did but to associate them with
+                    <strong>{{ house.name }}</strong> you can invite them to have access to manage this
+                    house just like you can.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

@@ -2,9 +2,11 @@ from django import http
 from django.core.urlresolvers import reverse
 from django.utils.timezone import utc
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db import transaction
+from django.core.mail import send_mail
 
 from . import models
 from . import forms
@@ -48,6 +50,12 @@ def photos(request, slug):
 def photos_upload(request, slug):
     context = {}
     house = get_object_or_404(models.House, slug=slug, owners=request.user)
+    context['house'] = house
+    context['page_title'] = 'Photo upload'
+    form = forms.PhotoUploadForm()
+    context['form'] = form
+    context['filepicker_api_key'] = settings.FILEPICKER_API_KEY
+    return render(request, 'main/photos_upload.html', context)
 
 
 @login_required
@@ -76,3 +84,50 @@ def address(request, slug):
     for field in form.fields:
         form.fields[field].widget.attrs['class'] = 'pure-input-1-3'
     return render(request, 'main/address.html', context)
+
+
+@login_required
+@transaction.commit_on_success
+def accounts(request, slug):
+    context = {}
+    house = get_object_or_404(models.House, slug=slug, owners=request.user)
+    context['house'] = house
+    context['page_title'] = 'Accounts'
+    if request.method == 'POST':
+        form = forms.InviteForm(request.POST)
+        if form.is_valid():
+            invitation = models.Invitation.objects.create(
+                house=house,
+                user=request.user,
+                email_address=form.cleaned_data['email_address'],
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                message=form.cleaned_data['message'],
+            )
+            send_invite(invitation, request)
+            invitation.send_date = models.now()
+            invitation.save()
+            return redirect('main:accounts', house.slug)
+    else:
+        form = forms.InviteForm()
+    for field in form.fields:
+        form.fields[field].widget.attrs['class'] = 'pure-input-1-3'
+        placeholder = ''
+        form.fields[field].widget.attrs['placeholder'] = placeholder
+    context['form'] = form
+    return render(request, 'main/accounts.html', context)
+
+
+def send_invite(invitation, request):
+    context = {
+        'invitation': invitation,
+    }
+    body = render_to_string('main/_invitation.txt', context)
+    subject = 'Invitation to manage %s' % house.name
+    send_email(
+        subject,
+        body,
+        settings.WEBMASTER_FROM,
+        [invitation.email_address],
+        reply_to=invitation.user.email
+    )

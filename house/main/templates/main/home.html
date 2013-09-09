@@ -104,10 +104,20 @@
 
             <div class="pure-u-1-4">
                 <div class="l-box">
-                    <h3>Subheading</h3>
+                    <h3>Your Account</h3>
                     <p>
-                        Donec suscipit, risus vel venenatis ornare, nibh massa ultrices diam, a elementum metus felis sit amet eros. Phasellus pellentesque euismod massa sed pellentesque.
+                        <strong>People with access</strong>
                     </p>
+                    <ul>
+                        {% for user in house.owners.all() %}
+                        <li>{% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                        {% else %}
+                        {{ user.email }}
+                        {% endif %}
+                        {% endfor %}
+                        <li><a href="{{ url('main:accounts', house.slug) }}">Add more users</a></li>
+                    </ul>
                 </div>
             </div>
 

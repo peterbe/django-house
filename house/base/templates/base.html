@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ page_title }}{% endblock %}</title>
 <link rel="stylesheet" href="{{ static('css/pure-min.css') }}">
-<!--<link href='http://fonts.googleapis.com/css?family=Raleway:500' rel='stylesheet' type='text/css'>-->
-<link href='http://fonts.googleapis.com/css?family=Raleway:400' rel='stylesheet' type='text/css'>
+<!--<link href='http://fonts.googleapis.com/css?family=Raleway:400' rel='stylesheet' type='text/css'>-->
 <link rel="stylesheet" href="{{ static('css/base.css') }}">
 <link rel="shortcut icon" href="{{ static('images/favicon.ico') }}">
 
@@ -19,7 +18,15 @@
 <div class="content">
     <div class="header">
         <div class="pure-menu pure-menu-open pure-menu-fixed pure-menu-horizontal">
-            <a class="pure-menu-heading" href="/">{% block page_title %}{{ page_title }}{% endblock %}</a>
+            {% block home_link %}
+            <a class="pure-menu-heading"
+            {% if house %}
+            href="{{ url('main:home', house.slug) }}" title="{{ house.name }}"
+            {% else %}
+            href="/"
+            {% endif %}
+            >{% block page_title %}I Love My House{% endblock %}</a>
+            {% endblock %}
 
             <p style="float:right;margin-top:1px;margin-bottom:1px">
             {% if user.is_authenticated() %}
