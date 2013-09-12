@@ -28,4 +28,10 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[-\w]+)/accounts/$',
         views.accounts,
         name='accounts'),
+    url(r'^(?P<slug>[-\w]+)/accounts/sendagain/(?P<identifier>\w+)/$',
+        views.send_again,
+        name='send_again'),
+    url(r'^(?P<slug>[-\w]+)/accounts/accept/(?P<identifier>\w+)/$',
+        views.accept_invitation,
+        name='accept_invitation'),
 )

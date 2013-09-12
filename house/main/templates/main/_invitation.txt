@@ -1,0 +1,17 @@
+{% if invitation.first_name %}Hi {{ invitation.first_name }},{% else %}Hi!{% endif %}
+
+You have been invited to manage: {{ invitation.house.name }}
+with {{ invitation.user.first_name or invitation.user.email }} on {{ PROJECT_NAME }}.
+
+To accept the invitation follow this link:
+
+{{ base_url }}{{ url('signin:start') }}?invite={{ invitation.identifier }}
+
+{% if invitation.message %}
+The following message was left for you:
+
+  {{ invitation.message|safe }}
+{% endif %}
+
+--
+{{ PROJECT_NAME }}

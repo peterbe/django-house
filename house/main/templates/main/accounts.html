@@ -26,6 +26,25 @@ textarea { width: 350px !important; height: 80px; }
                     </ul>
 
 
+                    {% if pending_invitations %}
+                    <p><strong>Pending invitations you have sent out:</strong></p>
+                    <ul>
+                      {% for invitation in pending_invitations %}
+                      <li style="margin-bottom: 20px">
+                        <form action="{{ url('main:send_again', house.slug, invitation.identifier) }}" method="post">
+                        {{ invitation.first_name }} {{ invitation.last_name }}
+                        {{ invitation.email_address }}
+                        -
+                        {{ invitation.modified | js_date }}
+                        {{ csrf() }}
+                        <button class="pure-button">Send again</button>
+                        </form>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% endif %}
+
+
                 </div>
             </div>
 

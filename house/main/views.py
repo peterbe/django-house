@@ -6,7 +6,8 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.db import transaction
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
+from django.contrib.sites.models import RequestSite
 
 from . import models
 from . import forms
@@ -21,10 +22,18 @@ def robots_txt(request):
 
 
 def start(request):
-    context = {'house': None}
+    context = {
+        'house': None,
+        'pending_invitation': None,
+    }
     if request.user.is_authenticated():
         for house in models.House.objects.filter(owners=request.user):
             context['house'] = house
+    if request.user.is_authenticated():
+        invitations = models.Invitation.objects.filter(email_address=request.user.email)
+        if invitations.count():
+            pending_invitation, = invitations[:1]
+            context['pending_invitation'] = pending_invitation
     return render(request, 'main/start.html', context)
 
 
@@ -104,6 +113,7 @@ def accounts(request, slug):
                 last_name=form.cleaned_data['last_name'],
                 message=form.cleaned_data['message'],
             )
+            assert invitation.identifier
             send_invite(invitation, request)
             invitation.send_date = models.now()
             invitation.save()
@@ -115,19 +125,63 @@ def accounts(request, slug):
         placeholder = ''
         form.fields[field].widget.attrs['placeholder'] = placeholder
     context['form'] = form
+    context['pending_invitations'] = (
+        models.Invitation.objects
+        .filter(user=request.user)
+        .order_by('-modified')
+    )
     return render(request, 'main/accounts.html', context)
 
 
 def send_invite(invitation, request):
+    protocol = 'https' if request.is_secure() else 'http'
+    base_url = '%s://%s' % (protocol, RequestSite(request).domain)
     context = {
         'invitation': invitation,
+        'base_url': base_url,
     }
     body = render_to_string('main/_invitation.txt', context)
-    subject = 'Invitation to manage %s' % house.name
-    send_email(
+    subject = 'Invitation to manage %s' % invitation.house.name
+    headers = {'Reply-To': invitation.user.email}
+    email = EmailMessage(
         subject,
         body,
         settings.WEBMASTER_FROM,
         [invitation.email_address],
-        reply_to=invitation.user.email
+        headers=headers,
     )
+    email.send()
+
+
+@login_required
+@transaction.commit_on_success
+def send_again(request, slug, identifier):
+    context = {}
+    invitation = get_object_or_404(
+        models.Invitation,
+        house__slug=slug,
+        user=request.user,
+        identifier=identifier
+    )
+    send_invite(invitation, request)
+    invitation.send_date = models.now()
+    invitation.save()
+    return redirect('main:accounts', invitation.house.slug)
+
+
+@login_required
+@transaction.commit_on_success
+def accept_invitation(request, slug, identifier):
+    context = {}
+    invitation = get_object_or_404(
+        models.Invitation,
+        house__slug=slug,
+        email_address=request.user.email,
+        identifier=identifier
+    )
+    house = invitation.house
+    house.owners.add(request.user)
+    house.save()
+    invitation.delete()
+
+    return redirect('main:home', house.slug)

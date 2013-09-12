@@ -28,9 +28,20 @@
                         <b>{{ page_title }}</b> is where you store all interesting and helpful information about the house you own and love so much.
                     </h2>
 
+                    {% if pending_invitation %}
+                    <p>
+                      <b>Welcome!</b> You have been invited by <b>{{ pending_invitation.user.email }}</b>
+                      to manage <b>{{ pending_invitation.house.name }}</b>.
+                    </p>
+                    <p>
+                        <a href="{{ url('main:accept_invitation', pending_invitation.house.slug, pending_invitation.identifier) }}" class="pure-button primary-button"
+                        >Accept invitation to <b>{{ pending_invitation.house.name }}</b></a>
+                    </p>
+                    {% else %}
                     <p>
                         <a href="{{ url('signin:start') }}" class="pure-button primary-button">Get Started</a>
                     </p>
+                    {% endif %}
                 </div>
             </div>
         </div>

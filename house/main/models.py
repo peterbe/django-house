@@ -1,3 +1,4 @@
+import uuid
 import os
 import hashlib
 import datetime
@@ -10,8 +11,15 @@ from django.utils.timezone import utc
 
 from sorl.thumbnail import ImageField
 
+
 def now():
     return datetime.datetime.utcnow().replace(tzinfo=utc)
+
+
+def identifier_maker(length):
+    def maker():
+        return uuid.uuid4().hex[:length]
+    return maker
 
 
 class Address(models.Model):
@@ -104,6 +112,7 @@ class Invitation(models.Model):
     last_name = models.CharField(max_length=100, blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     send_date = models.DateTimeField(blank=True, null=True)
+    identifier = models.CharField(max_length=32, default=identifier_maker(16))
 
     added = models.DateTimeField(default=now)
     modified = models.DateTimeField(default=now)
@@ -112,6 +121,7 @@ class Invitation(models.Model):
 @receiver(models.signals.pre_save, sender=Photo)
 @receiver(models.signals.pre_save, sender=Document)
 @receiver(models.signals.pre_save, sender=Address)
+@receiver(models.signals.pre_save, sender=Invitation)
 def update_modified(sender, instance, raw, *args, **kwargs):
     if raw:
         return

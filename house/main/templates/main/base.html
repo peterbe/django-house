@@ -7,3 +7,14 @@
                 <li><a href="{{ url('main:documents', house.slug) }}">Documents</a></li>
             </ul>
             {% endblock %}
+
+{% block extra_javascript %}
+{{ super() }}
+<script src="{{ static('js/jquery.timeago.js') }}"></script>
+<script>
+$(function() {
+    $.timeago.settings.allowFuture = true;
+    $('time.timeago').timeago();
+});
+</script>
+{% endblock %}
