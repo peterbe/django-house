@@ -95,27 +95,8 @@ $(function() {
 
   });
 
-  /*
-  $('#id_line1').on('change', function() {
-    var address = $(this).val();
-    if (!address) return;
-    if ($('#id_zip_code').val()) {
-      address += ', ' + $('#id_zip_code').val();
-    }
-    if ($('#id_state').val()) {
-      address += ', ' + $('#id_state').val();
-    }
-    _search(address);
-  });
-
-  $('#id_zip_code').on('change', function() {
-    var address = $(this).val();
-    if (!address) return;
-    if ($('#id_line1').val()) {
-      address = $('#id_line1').val() + ', ' + address;
-    }
-    _search(address);
-  });
-  */
-
+  if ($('.existing').size()) {
+    $('form.register').show();
+    $('form.search-form').hide();
+  }
 });

@@ -6,9 +6,24 @@
 {% block content_inner %}
 
         <div class="pure-g-r content-ribbon">
-            <div class="pure-u-1-2">
+            <div class="pure-u-1">
                 <div class="l-box">
                     <h4 class="content-subhead">Register</h4>
+
+                    {% if existing %}
+                    <div class="existing">
+                    <h3>Hmm... A house with that address has already been registered.</h3>
+                    {% for house in existing %}
+                    <p><b>{{ house.name }}</b> is currently owned by:</p>
+                    <ul>
+                      {% for user in house.owners.all() %}
+                      <li>{{ user.email | obfuscate_email }}</li>
+                      {% endfor %}
+                    </ul>
+                    {% endfor %}
+                    <p>Perhaps you have multiple accounts but logged in with the wrong email address?</p>
+                    </div>
+                    {% endif %}
 
                     <h3>Minimal Information to Register</h3>
 
@@ -29,12 +44,13 @@
                         <button type="submit" class="pure-button pure-button-primary">Proceed </button>
                       </fieldset>
                     </form>
+                </div><!-- /l-box -->
+            </div><!-- /pure-u-1 -->
+        </div>
 
 
-                </div>
-            </div>
-
-            <div class="pure-u-1-2">
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-1">
                 <div class="l-box">
                   <div class="loading" style="display:none">
                   Searching...

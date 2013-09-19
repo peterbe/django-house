@@ -173,6 +173,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     #'django.core.context_processors.i18n',
     'django.core.context_processors.media',
+    'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
     #'django.contrib.messages.context_processors.messages',
@@ -189,7 +190,7 @@ LOGIN_URL = '/signin/'
 LOGIN_REDIRECT_URL_FAILURE = '/signin/failed/'
 
 # Path to redirect to on logout.
-LOGOUT_REDIRECT_URL = '/signin/loggedout/'
+LOGOUT_REDIRECT_URL = '/signin/signedout/'
 
 JINGO_EXCLUDE_APPS = (
     'admin',

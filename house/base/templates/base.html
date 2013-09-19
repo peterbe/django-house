@@ -28,9 +28,10 @@
             >{% block page_title %}I Love My House{% endblock %}</a>
             {% endblock %}
 
-            <p style="float:right;margin-top:1px;margin-bottom:1px">
+            <p class="auth">
             {% if user.is_authenticated() %}
             <a href="{{ url('signin:account') }}">You are signed in as {{ user.email }}</a>
+            <a class="signout" href="{{ url('signin:signout') }}">Sign out</a>
             {% else %}
             <a href="{{ url('signin:start') }}">Sign in/Register</a>
             {% endif %}

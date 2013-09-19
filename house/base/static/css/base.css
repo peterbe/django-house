@@ -90,3 +90,16 @@ body .primary-button {
 .required {
     color: red;
 }
+
+
+.pure-menu .auth {
+    float: right;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    font-size: 80%;
+}
+.pure-menu .auth a {
+    display: inline;
+    padding-left: 5px;
+    padding-right: 5px;
+}

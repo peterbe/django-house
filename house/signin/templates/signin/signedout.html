@@ -1,0 +1,26 @@
+{% extends "signin/base.html" %}
+
+
+{% block content_inner %}
+
+    <div class="splash">
+        <div class="pure-g-r">
+
+            <div class="pure-u-1">
+                <div class="l-box splash-text">
+
+                    <h3>You have signed out</h3>
+
+                    <p style="text-align: center">
+                    <a href="/" class="pure-button primary-button">Go the the Home page</a>
+                    <a href="{{ url('signin:start') }}" class="pure-button primary-button">Sign in again</a>
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

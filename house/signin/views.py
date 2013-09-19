@@ -12,7 +12,12 @@ from house.main import models
 
 
 def start(request):
-    context = {}
+    context = {'house': None}
+    if request.user.is_authenticated():
+        try:
+            context['house'] = models.House.get_house(request.user)
+        except models.House.DoesNotExist:
+            pass
     return render(request, 'signin/start.html', context)
 
 
@@ -20,26 +25,30 @@ def failed(request):
     pass
 
 
-def loggedout(request):
-    pass
-
-
 @login_required
 @transaction.commit_on_success
 def register(request):
-    context = {}
+    context = {'existing': None}
     if request.method == 'POST':
         form = forms.AddressForm(request.POST)
         if form.is_valid():
-            address = form.save()
-            house = models.House.objects.create(
-                name=address.line1,
-                slug=slugify(address.line1),
-                address=address,
+            # is there a house with the exact same address and town?
+            existing = models.House.objects.filter(
+                address__line1__iexact=form.cleaned_data['line1'],
+                address__city__iexact=form.cleaned_data['city']
             )
-            house.owners.add(request.user)
-            url = reverse('signin:done')
-            return redirect(url)
+            if existing:
+                context['existing'] = existing
+            else:
+                address = form.save()
+                house = models.House.objects.create(
+                    name=address.line1,
+                    slug=slugify(address.line1),
+                    address=address,
+                )
+                house.owners.add(request.user)
+                url = reverse('signin:done')
+                return redirect(url)
     else:
         initial = {'country': 'United States'}
         form = forms.AddressForm(initial=initial)
@@ -58,5 +67,17 @@ def done(request):
     return render(request, 'signin/done.html', context)
 
 
+@login_required
 def account(request):
-    pass
+    context = {}
+    return render(request, 'signin/account.html', context)
+
+
+@login_required
+def signout(request):
+    context = {}
+    return render(request, 'signin/signout.html', context)
+
+
+def signedout(request):
+    return render(request, 'signin/signedout.html')

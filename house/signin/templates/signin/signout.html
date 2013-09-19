@@ -1,0 +1,28 @@
+{% extends "signin/base.html" %}
+
+
+{% block content_inner %}
+{{ browserid_info() }}
+
+    <div class="splash">
+        <div class="pure-g-r">
+
+            <div class="pure-u-1">
+                <div class="l-box splash-text">
+
+                <p style="text-align: center">
+                    <a href="/browserid/logout/" class="pure-button primary-button browserid-logout">Sign out</a>
+                </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+{{ super() }}
+{{ browserid_js() }}
+{% endblock %}

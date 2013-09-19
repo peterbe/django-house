@@ -25,7 +25,12 @@
                 <div class="l-box">
                     {% if user.is_authenticated() %}
                     <p>You're already signed in.</p>
-                    <p><a href="{{ url('signin:register') }}">Proceed to registration</a></p>
+                      {% if house %}
+                      <p><a href="{{ url('main:home', house.slug) }}">Go to <b>{{ house.name }}</b></p>
+                      {% else %}
+                      <p><a href="{{ url('signin:register') }}">Proceed to registration</a></p>
+                      {% endif %}
+
                     {% else %}
                     <a href="#" data-next="/signin/" class="browserid-login persona-button dark"><span>Sign in with your Email</span></a>
                     {# {{ browserid_login(text='Login') }} #}
