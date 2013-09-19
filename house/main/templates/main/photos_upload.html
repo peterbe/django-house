@@ -7,11 +7,23 @@
                 <div class="l-box">
                     <h4 class="content-subhead">Photo Upload</h4>
 
-                    <p>All upload is done using FilePicker. It's simpler. It's safer.</p>
-                    <form method="post" class="upload pure-form pure-form-stacked">
+                    <p>All upload is done using <b>Ink File Picker</b>. It's simpler. It's safer.</p>
+
+                    <form method="post" class="upload pure-form pure-form-stacked" style="display:none">
                       {{ csrf() }}
                       <fieldset>
-                        {{ pureform(form) }}
+                        <table class="pure-table pure-table-horizontal">
+                          <thead>
+                            <tr>
+                              <th>Keep</th>
+                              <th>Preview</th>
+                              <th>Filename</th>
+                              <th>Size</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
                         <button type="submit" class="pure-button pure-button-primary">Save</button>
                       </fieldset>
                     </form>
@@ -22,15 +34,21 @@
 
             <div class="pure-u-1-2">
                 <div class="l-box">
-                  FILEPICKER
+                  <button type="button" class="open-filepicker pure-button pure-button-primary">Open Ink File Picker</button>
+
+                  <form>
+                  <p>I'm getting comfortable with this,<br>
+                  <input type="checkbox" name="open_filepicker_automatically"> Open Ink File Picker automatically next time.
+                  </p>
+                  </form>
                 </div>
             </div>
         </div>
-
 {% endblock %}
 
 {% block extra_javascript %}
 <script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
+{% if DEBUG %}<script type="text/javascript" src="//api.filepicker.io/v1/filepicker_debug.js"></script>{% endif %}
 <script>filepicker.setKey('{{ filepicker_api_key }}');</script>
 <script src="{{ static('main/js/photos_upload.js') }}"></script>
 {% endblock %}

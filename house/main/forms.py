@@ -19,9 +19,9 @@ class AddressForm(BaseModelForm):
         self.fields['longitude'].widget = widgets.HiddenInput()
 
 
-class PhotoUploadForm(BaseForm):
-
-    url = forms.URLField(widget=widgets.HiddenInput())
+#class PhotoUploadForm(BaseForm):
+#
+#    url = forms.URLField(widget=widgets.HiddenInput())
 
 
 class InviteForm(BaseForm):

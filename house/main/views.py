@@ -56,13 +56,18 @@ def photos(request, slug):
 
 
 @login_required
+@transaction.commit_on_success
 def photos_upload(request, slug):
     context = {}
     house = get_object_or_404(models.House, slug=slug, owners=request.user)
     context['house'] = house
     context['page_title'] = 'Photo upload'
-    form = forms.PhotoUploadForm()
-    context['form'] = form
+    if request.method == 'POST':
+        urls = request.POST.getlist('urls')
+        print urls
+        raise Exception
+    #form = forms.PhotoUploadForm()
+    #context['form'] = form
     context['filepicker_api_key'] = settings.FILEPICKER_API_KEY
     return render(request, 'main/photos_upload.html', context)
 
