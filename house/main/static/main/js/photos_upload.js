@@ -17,7 +17,8 @@ function make_preview_field_row(container, url, name, size, thumbnail) {
     .append($('<input type="checkbox" name="urls" checked>').val(url))
     .appendTo(row);
   $('<td></td>')
-    .append($('<img alt="Preview" width="70">').attr('src', thumbnail))
+    .append($('<img alt="Preview">')
+            .attr('src', thumbnail))
     .appendTo(row);
   $('<td></td>')
     .append($('<span>').text(name))
@@ -26,6 +27,15 @@ function make_preview_field_row(container, url, name, size, thumbnail) {
     .append($('<span>').text(humanFileSize(size)))
     .appendTo(row);
   row.appendTo(container);
+}
+
+
+function add_preview_field_url(container, url, thumbnail) {
+  $('tr').each(function(i, row) {
+    if ($('input[name="urls"]', row).val() == url) {
+      $('img', row).attr('src', thumbnail);
+    }
+  });
 }
 
 
@@ -40,16 +50,22 @@ function open_filepicker() {
     function(InkBlobs){
       console.log(InkBlobs);
       var container = $('form.upload tbody');
+      var placeholder_url = container.data('placeholder-url');
+      (new Image()).src = placeholder_url;  // preloading
+
       $.each(InkBlobs, function(i, InkBlob) {
-        console.log('BLOB', InkBlob);
-        filepicker.convert(InkBlob, {width: 70, height: 70}, function(metadata) {
-          console.log('   METADATA', metadata);
-          make_preview_field_row(container, InkBlob.url, InkBlob.filename, InkBlob.size, metadata.url);
+        //console.log('BLOB', InkBlob);
+        make_preview_field_row(container, InkBlob.url, InkBlob.filename, InkBlob.size, placeholder_url);
+        filepicker.convert(InkBlob, {width: 60, height: 60}, function(metadata) {
+          //console.log('   METADATA', metadata);
+          add_preview_field_url(container, InkBlob.url, metadata.url, 60);
+
         });
       });
       $('form.upload:hidden').show();
     },
     function(FPError){
+      // TODO needs a lot more work
       console.log(FPError.toString());
     }
   );

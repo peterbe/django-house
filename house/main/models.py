@@ -64,13 +64,13 @@ def _upload_path(tag):
             )
         _now = now()
         path = os.path.join(
-            "%05d" % instance.pk,
+#            "%05d" % instance.pk,
             _now.strftime('%Y'),
             _now.strftime('%m'),
             _now.strftime('%d')
         )
         hashed_filename = (hashlib.md5(filename +
-                           str(now.microsecond)).hexdigest())
+                           str(now().microsecond)).hexdigest())
         __, extension = os.path.splitext(filename)
         return os.path.join(tag, path, hashed_filename + extension)
     return _upload_path_tagged
@@ -81,8 +81,12 @@ class Photo(models.Model):
     photo = ImageField(upload_to=_upload_path('photos'))
     cover = models.DateTimeField(blank=True, null=True)
     description = models.TextField(null=True, blank=True)
+    added_by = models.ForeignKey(User)
     added = models.DateTimeField(default=now)
     modified = models.DateTimeField(default=now)
+
+    def set_cover_photo(self):
+        self.cover = now()
 
     @classmethod
     def get_cover_photo(self, house):
@@ -99,6 +103,7 @@ class Document(models.Model):
     description = models.TextField(blank=True, null=True)
     searchable_text = models.TextField(blank=True, null=True)
     text_extracted = models.BooleanField(default=False)
+    added_by = models.ForeignKey(User)
 
     added = models.DateTimeField(default=now)
     modified = models.DateTimeField(default=now)
@@ -116,6 +121,7 @@ class Invitation(models.Model):
 
     added = models.DateTimeField(default=now)
     modified = models.DateTimeField(default=now)
+
 
 @receiver(models.signals.pre_save, sender=House)
 @receiver(models.signals.pre_save, sender=Photo)

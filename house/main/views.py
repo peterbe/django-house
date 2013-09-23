@@ -1,3 +1,8 @@
+import os
+import tempfile
+from StringIO import StringIO
+import requests
+
 from django import http
 from django.core.urlresolvers import reverse
 from django.utils.timezone import utc
@@ -8,6 +13,8 @@ from django.conf import settings
 from django.db import transaction
 from django.core.mail import EmailMessage
 from django.contrib.sites.models import RequestSite
+from django.contrib.auth.models import User
+from django.core.files import File
 
 from . import models
 from . import forms
@@ -43,6 +50,14 @@ def home(request, slug):
     house = get_object_or_404(models.House, slug=slug, owners=request.user)
     context['house'] = house
     context['page_title'] = house.name
+    context['cover_photo'] = None
+    cover_photos = models.Photo.objects.filter(
+        house=house,
+        cover__isnull=False
+    ).order_by('-cover')
+    for photo in cover_photos[:1]:
+        context['cover_photo'] = photo
+
     return render(request, 'main/home.html', context)
 
 
@@ -64,13 +79,50 @@ def photos_upload(request, slug):
     context['page_title'] = 'Photo upload'
     if request.method == 'POST':
         urls = request.POST.getlist('urls')
-        print urls
-        raise Exception
-    #form = forms.PhotoUploadForm()
-    #context['form'] = form
+        for url in urls:
+            # really wish this was a background task
+            download_and_attach_to_house(
+                'photo',
+                house.id,
+                url,
+                request.user.id
+            )
+        return redirect('main:photos', house.slug)
     context['filepicker_api_key'] = settings.FILEPICKER_API_KEY
     return render(request, 'main/photos_upload.html', context)
 
+
+def download_and_attach_to_house(type_, house_id, file_url, user_id):
+    """this function is ideal for running as a celery task"""
+    house = models.House.objects.get(pk=house_id)
+    user = User.objects.get(pk=user_id)
+    assert user in house.owners.all(), user
+
+    if type_ == 'photo':
+        model = models.Photo
+    elif type_ == 'document':
+        model = models.Document
+    else:
+        raise NotImplementedError
+
+    tmp_dir = tempfile.mkdtemp()
+    try:
+        r = requests.get(file_url)
+        filename = r.headers.get('x-file-name')
+        content = File(StringIO(r.content), name=filename)
+        if type_ == 'photo':
+            instance = models.Photo.objects.create(
+                house=house,
+                photo=content,
+                added_by=user,
+            )
+            if models.Photo.objects.filter(house=house).count() == 1:
+                instance.set_cover_photo()
+                instance.save()
+        else:
+            raise NotImplementedError
+    finally:
+        os.removedirs(tmp_dir)
 
 @login_required
 def documents(request, slug):
