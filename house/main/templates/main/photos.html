@@ -1,0 +1,98 @@
+{% extends "main/base.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ static('main/css/modal.css') }}">
+<link rel="stylesheet" href="{{ static('main/css/gallery.css') }}">
+{% endblock %}
+
+
+{% macro photo_box(photo) %}
+        <div class="pure-u-1-3 photo-box" id="id-{{ photo.pk }}">
+            {% set thumb = thumbnail(photo.photo, "500x500") %}
+            {% set big = thumbnail(photo.photo, "1200x1200") %}
+            <a href="{{ big.url }}">
+                <img src="{{ thumb.url }}"
+                     alt="{% if photo.description %}{{ photo.description }}{% else %}No description{% endif %}">
+            </a>
+
+            <aside class="photo-box-caption">
+                {% if photo.description %}
+                {{ photo.description }}
+                {% endif %}
+                <span>
+                    <a href="#id-{{ photo.pk }}" data-id="{{ photo.pk }}" class="edit">
+                    {% if photo.description %}
+                    Click to edit photo
+                    {% else %}
+                    Click to set photo description
+                    {% endif %}
+                    </a>
+                </span>
+            </aside>
+        </div>
+{% endmacro %}
+
+{% block content %}
+    <div class="pure-g-r">
+
+        {{ photo_box(cover_photo) }}
+
+        <div class="pure-u-2-3 text-box">
+            <div class="l-box">
+                <h1 class="text-box-head">Photos of your house</h1>
+                <!--<p class="text-box-subhead">A collection of beautiful Flickr photos.</p>-->
+            </div>
+        </div>
+
+	{% for photo in other_photos %}
+	{{ photo_box(photo) }}
+	{% endfor %}
+
+        <div class="pure-u-1 form-box">
+            <div class="l-box">
+		<a href="{{ url('main:photos.upload', house.slug) }}" class="pure-button">Upload More Photos</a>
+            </div>
+        </div>
+
+    </div>
+
+
+<div id="photo-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit-photo-label" aria-hidden="true">
+    <div class="modal-header">
+        <h1 id="edit-photo-label">Edit Photo</h1>
+    </div>
+
+    <div class="modal-body">
+
+        <div class="modal-thumbnail" style="text-align:center">
+        </div>
+        <!--<p>
+            This modal is launched by including <em>just</em> the <code>modal.css</code> and <code>modal.js</code> file from Bootstrap, and including Pure to drive all low-level styles. The result is a fully-functional Modal using just a fraction of the CSS.
+        </p>-->
+
+        <form class="pure-form pure-form-stacked">
+        {{ csrf() }}
+            <label>Description</label>
+            <input name="description" type="text" placeholder="Enter a short description" class="pure-input-1">
+
+            <label class="pure-checkbox">
+                <input name="coverphoto" type="checkbox"> Make this the cover photo for <b>{{ house.name }}</b>
+            </label>
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <img src="{{ static('main/images/spinner.gif') }}" style="display:none">
+        <button class="pure-button" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="pure-button pure-button-primary">Save</button>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+<script src="{{ static('main/libs/bootstrap-modal.min.js') }}"></script>
+<script src="{{ static('main/js/photos.js') }}"></script>
+{% endblock %}

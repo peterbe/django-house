@@ -74,4 +74,15 @@ function open_filepicker() {
 
 $(function() {
   $('button.open-filepicker').click(open_filepicker);
+  if ($('input[name="open_filepicker_automatically"]').size()) {
+    Remember.get('open_filepicker_automatically', false, function(value) {
+      $('input[name="open_filepicker_automatically"]').attr('checked', 'checked');
+      $('button.open-filepicker').click();
+    });
+  }
+
+  $('input[name="open_filepicker_automatically"]').on('change', function() {
+    Remember.set('open_filepicker_automatically', this.checked);
+  });
+
 });

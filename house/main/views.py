@@ -1,6 +1,7 @@
 import os
 import tempfile
 from StringIO import StringIO
+
 import requests
 
 from django import http
@@ -18,6 +19,8 @@ from django.core.files import File
 
 from . import models
 from . import forms
+from . import utils
+from .helpers import thumbnail
 
 
 def robots_txt(request):
@@ -67,7 +70,44 @@ def photos(request, slug):
     house = get_object_or_404(models.House, slug=slug, owners=request.user)
     context['house'] = house
     context['page_title'] = 'Photos for %s' % house.name
+    photos = models.Photo.objects.filter(house=house).order_by('-added')
+    cover_photo, = photos.filter(cover__isnull=False).order_by('-cover')[:1]
+    context['cover_photo'] = cover_photo
+    context['other_photos'] = photos.exclude(pk=cover_photo.pk)
     return render(request, 'main/photos.html', context)
+
+
+@login_required
+@utils.json_view
+def photo(request, slug, pk):
+    context = {}
+    house = get_object_or_404(models.House, slug=slug, owners=request.user)
+    photo = get_object_or_404(models.Photo, pk=pk, house=house)
+    if request.method == 'POST':
+        photo.description = request.POST.get('description').strip()
+        if request.POST.get('coverphoto') != 'false':
+            photo.set_cover_photo()
+        photo.save()
+
+    geometry = '150x150'
+    options = {'crop': 'center'}
+
+    tb = thumbnail(photo.photo, geometry, **options)
+    is_cover_photo = False
+    if photo.cover:
+        # but it is the most recent?
+        if models.Photo.get_cover_photo(house) == photo:
+            is_cover_photo = True
+    data = {
+        'description': photo.description,
+        'thumbnail': {
+            'url': tb.url,
+            'width': tb.width,
+            'height': tb.height,
+        },
+        'is_cover_photo': is_cover_photo
+    }
+    return data
 
 
 @login_required
@@ -89,6 +129,11 @@ def photos_upload(request, slug):
             )
         return redirect('main:photos', house.slug)
     context['filepicker_api_key'] = settings.FILEPICKER_API_KEY
+
+    context['offer_automatic_opener'] = True
+    if not models.Photo.objects.filter(house=house):
+        context['offer_automatic_opener'] = False
+
     return render(request, 'main/photos_upload.html', context)
 
 

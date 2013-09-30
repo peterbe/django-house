@@ -22,7 +22,11 @@ def start(request):
 
 
 def failed(request):
-    pass
+    context = {}
+    if request.user.is_authenticated():
+        return redirect('signin:start')
+
+    return render(request, 'signin/failed.html', context)
 
 
 @login_required
