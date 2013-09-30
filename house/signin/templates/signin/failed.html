@@ -1,0 +1,29 @@
+{% extends "signin/start.html" %}
+
+
+{% block content_inner %}
+{{ browserid_info() }}
+
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-2-3">
+                <div class="l-box">
+                    <h4 class="content-subhead">Sign In Failed</h4>
+
+                    <p>
+                        For some reason the authentication with <b>Persona</b> failed. <br>
+                        Perhaps it was just a temporary thing or something went wrong
+                        with the password you entered. <br>
+                        Please try again.
+                    </p>
+                </div>
+            </div>
+
+            <div class="pure-u-1-3">
+                <div class="l-box">
+                    <a  style="margin:100px;" href="#" data-next="/signin/" class="browserid-login persona-button dark"><span>Sign in with your Email</span></a>
+                </div>
+            </div>
+        </div>
+
+
+{% endblock %}
