@@ -1,3 +1,4 @@
+import stat
 import uuid
 import os
 import hashlib
@@ -97,7 +98,9 @@ class Photo(models.Model):
 
 class Document(models.Model):
     house = models.ForeignKey(House)
-    picture = ImageField(upload_to=_upload_path('documents'), blank=True, null=True)
+    file = models.FileField(upload_to=_upload_path('documents'))
+    filename = models.CharField(max_length=100)
+    #picture = ImageField(upload_to=_upload_path('documents'), blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     document_type = models.CharField(max_length=100, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -107,6 +110,13 @@ class Document(models.Model):
 
     added = models.DateTimeField(default=now)
     modified = models.DateTimeField(default=now)
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__name__, self.file.path)
+
+    @property
+    def file_size(self):
+        return os.stat(self.file.path)[stat.ST_SIZE]
 
 
 class Invitation(models.Model):

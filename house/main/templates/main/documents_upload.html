@@ -1,0 +1,58 @@
+{% extends "main/base.html" %}
+
+{% block content_inner %}
+
+        <div class="pure-g-r content-ribbon">
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                    <h4 class="content-subhead">Document Upload</h4>
+
+                    <p>All upload is done using <b>Ink File Picker</b>. It's simpler. It's safer.</p>
+
+                    <form method="post" class="upload pure-form pure-form-stacked" style="display:none">
+                      {{ csrf() }}
+                      <fieldset>
+                        <table class="pure-table pure-table-horizontal">
+                          <thead>
+                            <tr>
+                              <th>Keep</th>
+                              <th>Filename</th>
+                              <th>Document title</th>
+                              <th>Size</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                        <button type="submit" class="pure-button pure-button-primary">Save</button>
+                      </fieldset>
+                    </form>
+
+
+                </div>
+            </div>
+
+            <div class="pure-u-1-2">
+                <div class="l-box">
+                  <button type="button" class="open-filepicker pure-button pure-button-primary">Open Ink File Picker</button>
+
+                  {% if offer_automatic_opener %}
+                  <form>
+                  <p>I'm getting comfortable with this,<br>
+                  <input type="checkbox" name="open_filepicker_automatically"> Open Ink File Picker automatically next time.
+                  </p>
+                  </form>
+                  {% endif %}
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block extra_javascript %}
+<script type="text/javascript" src="//api.filepicker.io/v1/filepicker.js"></script>
+{% if DEBUG %}<script type="text/javascript" src="//api.filepicker.io/v1/filepicker_debug.js"></script>{% endif %}
+<script>filepicker.setKey('{{ filepicker_api_key }}');</script>
+<script src="{{ static('main/libs/async-local-storage-with-Promise.min.js') }}"></script>
+<script src="{{ static('main/js/remember.js') }}"></script>
+<script src="{{ static('main/js/documents_upload.js') }}"></script>
+{% endblock %}

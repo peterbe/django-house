@@ -6,7 +6,7 @@
             <div class="pure-u-1-3">
                 <div class="l-box splash-image">
                 {% if cover_photo %}
-                    {% set big = thumbnail(cover_photo.photo, "400x400") %}
+                    {% set big = thumbnail(cover_photo.photo, "400x300", crop='center') %}
                     <img src="{{ big.url }}" width="{{ big.width }}" height="{{ big.height }}"
                          alt="{% if cover_photo.title %}{{ cover_photo.title }}{% else %}{{ house.name }}{% endif %}">
                 {% else %}
@@ -29,6 +29,8 @@
 
                     <p>
                         {% if cover_photo %}
+                        <a href="{{ url('main:documents.upload', house.slug) }}" class="pure-button primary-button">Upload documents</a>
+                        <a href="{{ url('main:photos.upload', house.slug) }}" class="pure-button primary-button">Upload more photos</a>
                         {% else %}
                         <a href="{{ url('main:photos.upload', house.slug) }}" class="pure-button primary-button">Upload your cover photo</a>
                         {% endif %}

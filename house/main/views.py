@@ -1,5 +1,7 @@
+import logging
 import os
 import tempfile
+import mimetypes
 from StringIO import StringIO
 
 import requests
@@ -20,7 +22,11 @@ from django.core.files import File
 from . import models
 from . import forms
 from . import utils
+from . import api
 from .helpers import thumbnail
+
+
+logger = logging.getLogger('house:main')
 
 
 def robots_txt(request):
@@ -137,6 +143,41 @@ def photos_upload(request, slug):
     return render(request, 'main/photos_upload.html', context)
 
 
+@login_required
+@transaction.commit_on_success
+def documents_upload(request, slug):
+    context = {}
+    house = get_object_or_404(models.House, slug=slug, owners=request.user)
+    context['house'] = house
+    context['page_title'] = 'Document upload'
+    if request.method == 'POST':
+        urls = request.POST.getlist('urls')
+        titles = request.POST.getlist('titles')
+        filenames = request.POST.getlist('filenames')
+        for i, url in enumerate(urls):
+            # really wish this was a background task
+            document = download_and_attach_to_house(
+                'document',
+                house.id,
+                url,
+                request.user.id
+            )
+            if titles[i].strip():
+                document.title = titles[i]
+            if filenames[i].strip():
+                document.filename = filenames[i]
+            if titles[i].strip() or filenames[i].strip():
+                document.save()
+        return redirect('main:documents', house.slug)
+    context['filepicker_api_key'] = settings.FILEPICKER_API_KEY
+
+    context['offer_automatic_opener'] = True
+    if not models.Document.objects.filter(house=house):
+        context['offer_automatic_opener'] = False
+
+    return render(request, 'main/documents_upload.html', context)
+
+
 def download_and_attach_to_house(type_, house_id, file_url, user_id):
     """this function is ideal for running as a celery task"""
     house = models.House.objects.get(pk=house_id)
@@ -164,10 +205,25 @@ def download_and_attach_to_house(type_, house_id, file_url, user_id):
             if models.Photo.objects.filter(house=house).count() == 1:
                 instance.set_cover_photo()
                 instance.save()
+            return instance
+        elif type_ == 'document':
+            instance = models.Document.objects.create(
+                house=house,
+                file=content,
+                title=utils.filename2title(filename),
+                document_type=utils.filename2document_type(filename),
+                added_by=user,
+            )
+            try:
+                api.process_document_text(instance)
+            except Exception:
+                logger.error('Unable to process %r' % instance, exc_info=True)
+            return instance
         else:
             raise NotImplementedError
     finally:
         os.removedirs(tmp_dir)
+
 
 @login_required
 def documents(request, slug):
@@ -175,7 +231,28 @@ def documents(request, slug):
     house = get_object_or_404(models.House, slug=slug, owners=request.user)
     context['house'] = house
     context['page_title'] = 'Documents for %s' % house.name
+
+    documents = models.Document.objects.filter(house=house).order_by('-added')
+    if request.GET.get('q'):
+        # search
+        form = forms.DocumentSearchForm(request.GET)
+        if form.is_valid():
+            q = form.cleaned_data['q']
+            raise NotImplementedError
+    context['documents'] = documents
     return render(request, 'main/documents.html', context)
+
+
+@login_required
+def document_download(request, slug, pk):
+    context = {}
+    house = get_object_or_404(models.House, slug=slug, owners=request.user)
+    document = get_object_or_404(models.Document, house=house, pk=pk)
+    response = http.HttpResponse(mimetype=mimetypes.guess_type(document.filename))
+    response.write(document.file.read())
+    response['Content-Disposition'] = 'inline; filename="%s"' % document.filename
+    response['Content-Length'] = document.file_size
+    return response
 
 
 @login_required

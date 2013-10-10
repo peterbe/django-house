@@ -1,0 +1,101 @@
+{% extends "main/base.html" %}
+
+{% block extra_head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ static('main/css/modal.css') }}">
+<link rel="stylesheet" href="{{ static('main/css/documents.css') }}">
+{% endblock %}
+
+
+{% macro document_box(document) %}
+                <section class="post" id="id-{{ document.pk }}">
+                    <header class="post-header">
+                        {% set icon=document_icon(document.document_type) %}
+                        <img class="post-avatar"
+                             alt="{{ document.document_type }}"
+                             src="{{ static(icon.src) }}"
+                             width="{{ icon.width }}" height="{{ icon.height }}">
+
+                        <h2 class="post-title">{{ document.title }}</h2>
+
+                        <p class="post-meta">
+                            Uploaded by <b>{{ document.added_by.email }}</b>
+                            &mdash;
+                            {{ file_size(document.file_size) }}
+                            <!--<a class="post-category post-category-js" href="#">JavaScript</a>-->
+                        </p>
+                    </header>
+
+                    {% if document.searchable_text %}
+                    <div class="post-description">
+                        <p>
+                            {{ plain_text_extract(document.searchable_text, 200) }}
+                        </p>
+                    </div>
+                    {% endif %}
+                    <a class="pure-button" target="_blank" href="{{ url('main:document_download', house.slug, document.pk) }}">Download</a>
+                </section>
+
+{% endmacro %}
+
+{% block content %}
+
+   <div class="pure-u-1">
+            <form action="" class="search pure-form">
+              <input type="text" name="q" class="pure-input-rounded" placeholder="Search anything...">
+              <button class="pure-button">Search</button>
+            </form>
+        <div class="content">
+            <!-- A wrapper for all the blog posts -->
+            <div class="posts">
+	{% for document in documents %}
+	{{ document_box(document) }}
+	{% endfor %}
+            </div>
+        </div>
+
+        <div class="pure-u-1 form-box">
+            <div class="l-box">
+		<a href="{{ url('main:documents.upload', house.slug) }}" class="pure-button">Upload More Documents</a>
+            </div>
+        </div>
+
+    </div>
+
+
+<div id="document-edit" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit-photo-label" aria-hidden="true">
+    <div class="modal-header">
+        <h1 id="edit-photo-label">Edit Document</h1>
+    </div>
+
+    <div class="modal-body">
+
+        <!--<p>
+            This modal is launched by including <em>just</em> the <code>modal.css</code> and <code>modal.js</code> file from Bootstrap, and including Pure to drive all low-level styles. The result is a fully-functional Modal using just a fraction of the CSS.
+        </p>-->
+
+        <form class="pure-form pure-form-stacked">
+        {{ csrf() }}
+            <label>Title</label>
+            <input name="title" type="text" placeholder="Document title" class="pure-input-1">
+
+            <label>Description</label>
+            <textarea name="description" class="pure-input-1"></textarea>
+
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <img src="{{ static('main/images/spinner.gif') }}" style="display:none">
+        <button class="pure-button" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="pure-button pure-button-primary">Save</button>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_javascript %}
+<script src="{{ static('main/libs/bootstrap-modal.min.js') }}"></script>
+<script src="{{ static('main/js/documents.js') }}"></script>
+{% endblock %}
